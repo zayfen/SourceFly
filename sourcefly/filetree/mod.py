@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
-
 # coding: utf-8
 
 from pathlib import Path
 from typing import AnyStr
+from sourcefly.filetree.file_match_strategy import FileMatchStrategy
 
 
 def list_dir(dir: AnyStr):
