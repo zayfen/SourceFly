@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package = "SourceFly"
+package = "sourcefly"
 version = "0.1"
 
 setup(
