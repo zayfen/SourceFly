@@ -10,6 +10,16 @@ class FileDeps(object):
         self.file = file
         self.deps: list[FileDeps] = list()
 
+    def __str__(self):
+        return (
+            "{ file: "
+            + str(self.file)
+            + ", "
+            + "deps: [ "
+            + "\n".join(map(lambda fd: str(fd), self.deps))
+            + " ] }"
+        )
+
 
 class DepResolver(ABC):
     def __init__(self, entry: Path):
@@ -26,10 +36,6 @@ class DepResolver(ABC):
         parse depencies of file
 
         """
-        pass
-
-    @abstractmethod
-    def match_strategy(self) -> FileMatchStrategy:
         pass
 
     def __cache_file(self, file: Path):
