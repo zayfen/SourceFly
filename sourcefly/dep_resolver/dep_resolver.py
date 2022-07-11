@@ -1,6 +1,8 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional, Dict
+
+from sourcefly.filetree.file_match_strategy import FileMatchStrategy
 
 
 class FileDeps(object):
@@ -9,12 +11,14 @@ class FileDeps(object):
         self.deps: list[FileDeps] = list()
 
 
-class DepResolver(metaclass=ABCMeta):
+class DepResolver(ABC):
     def __init__(self, entry: Path):
         self.entry = entry
+
         self._resolved: Dict[
             Path, bool
         ] = dict()  # cache resolved file, prevent file from parsing again
+        self._root: Optional[FileDeps] = None
 
     @abstractmethod
     def parse_deps(self, file: Path) -> list[Path]:
@@ -22,6 +26,10 @@ class DepResolver(metaclass=ABCMeta):
         parse depencies of file
 
         """
+        pass
+
+    @abstractmethod
+    def match_strategy(self) -> FileMatchStrategy:
         pass
 
     def __cache_file(self, file: Path):
@@ -32,6 +40,9 @@ class DepResolver(metaclass=ABCMeta):
 
     def path_cached(self, file: Path) -> bool:
         return self._resolved.get(file, False)
+
+    def find_file_deps(self, file: Path) -> Optional[FileDeps]:
+        return None
 
     def gen_file_deps(self, file: Path) -> Optional[FileDeps]:
 
@@ -55,4 +66,10 @@ class DepResolver(metaclass=ABCMeta):
         return fd
 
     def deps_tree(self) -> Optional[FileDeps]:
-        return self.gen_file_deps(self.entry)
+        file_deps = self.gen_file_deps(self.entry)
+
+        # if resovled already, file_deps is None
+        if file_deps is not None:
+            self._root = file_deps
+
+        return self._root
