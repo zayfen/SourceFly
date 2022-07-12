@@ -22,8 +22,8 @@ class FileDeps(object):
 
 
 class DepResolver(ABC):
-    def __init__(self, entry: Path):
-        self.entry = entry
+    def __init__(self):
+        self.entry = None
 
         self._resolved: Dict[
             Path, bool
@@ -44,13 +44,20 @@ class DepResolver(ABC):
         """
         self._resolved[file] = True
 
+    def set_entry(self, entry: Path):
+        self.entry = entry
+
+    def __check_entry(self):
+        if self.entry is None:
+            raise ValueError("self.entry is None, please set entry first")
+
     def path_cached(self, file: Path) -> bool:
         return self._resolved.get(file, False)
 
     def find_file_deps(self, file: Path) -> Optional[FileDeps]:
         return None
 
-    def gen_file_deps(self, file: Path) -> Optional[FileDeps]:
+    def gen_file_deps(self, file: Optional[Path]) -> Optional[FileDeps]:
 
         if file is None or self.path_cached(file):
             return None
@@ -72,9 +79,10 @@ class DepResolver(ABC):
         return fd
 
     def deps_tree(self) -> Optional[FileDeps]:
+        self.__check_entry()
         file_deps = self.gen_file_deps(self.entry)
 
-        # if resovled already, file_deps is None
+        # if resovled already, file_deps will be None
         if file_deps is not None:
             self._root = file_deps
 

@@ -6,8 +6,8 @@ from sourcefly.dep_resolver.dep_resolver import DepResolver
 
 
 class CppDepResolver(DepResolver):
-    def __init__(self, entry: Path):
-        super().__init__(entry)
+    def __init__(self):
+        super().__init__()
 
     def parse_deps(self, file: Path) -> list[Path]:
         cpp_include_pattern = re.compile(
