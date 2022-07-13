@@ -90,27 +90,28 @@ class TreeNode:
             return "None"
 
         return node.tojson()
-        # _children = node.children.values() if node.children is not None else []
-        # return "{head} value: {value}, children: {children} {tail}".format(
-        #     head="{",
-        #     tail="}",
-        #     value=node.value,
-        #     children=str(list(map(lambda c: str(c), _children))),
-        # )
 
     def todict(self):
         d = dict()
-        d["value"] = self.value
-        d["children"] = list(
+        d[self.value] = list(
             map(
                 lambda item: item[1].todict(),
                 self.children.items(),
             )
         )
+
+        # d["value"] = self.value
+        # d["children"] = list(
+        #     map(
+        #         lambda item: item[1].todict(),
+        #         self.children.items(),
+        #     )
+        # )
+
         return d
 
     def tojson(self) -> str:
-        return json.dumps(self.todict(), indent=4)
+        return json.dumps(self.todict(), indent=2)
 
     def __str__(self) -> str:
         return TreeNode.__display(self)
