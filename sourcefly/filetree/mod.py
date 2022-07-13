@@ -73,7 +73,7 @@ class TreeNode:
         self,
         value: str,
         parent: Optional[Self] = None,
-        children: Dict[str, "TreeNode"] = {},
+        children = {},
     ):
         self.value: str = value
         self.parent = parent
@@ -143,29 +143,6 @@ class FileTree:
 
             self.__insert_path_to_tree_node(self.tree_nodes[root_p], paths[1:])
 
-    @staticmethod
-    def insert_path_to_tree_node(node: TreeNode, children_paths: list[str]):
-        _parent = node
-
-        if len(children_paths) == 0 or node is None:
-            return
-
-        _node_dict: dict[str, TreeNode] = _parent.children
-
-        for cp in children_paths:
-            zlogger.info(cp)
-            if _node_dict.get(cp) is None:
-                zlogger.info(" is None")
-                _node_dict[cp] = TreeNode(cp, _parent)
-
-            _parent = _node_dict[cp]
-            _node_dict = _parent.children
-
-            zlogger.info(_node_dict)
-            zlogger.info(_parent.value)
-            zlogger.info(list(map(lambda node: node.value, _node_dict.values())))
-
-        zlogger.info(list(map(lambda c: c.value, node.children.values())))
 
     def __insert_path_to_tree_node(self, node: TreeNode, children_paths: list[str]):
         zlogger.debug(node.value)
@@ -179,20 +156,20 @@ class FileTree:
             self.__save_leaf_node(_parent)
             return
 
-        _node_dict: dict[str, TreeNode] = _parent.children
-
         for cp in children_paths:
-            if _node_dict.get(cp) is None:
-                _node_dict[cp] = TreeNode(cp, _parent)
+            zlogger.info(cp)
+            if _parent.children.get(cp) is None:
+                zlogger.info(" is None")
+                new_node = TreeNode(cp, _parent, dict())
+                _parent.children[cp] = new_node
 
-            _parent = _node_dict[cp]
-            _node_dict = _node_dict[cp].children
-
-        zlogger.debug(len(node.children))
+            _parent = _parent.children[cp]
+            
         zlogger.debug(list(map(lambda c: c.value, node.children.values())))
 
         # now _parent is leaf node (save it)
         self.__save_leaf_node(_parent)
+
 
     def __save_leaf_node(self, node: TreeNode):
         if self.__leaf_nodes.get(node.value) is None:

@@ -46,12 +46,9 @@ def test_filetree():
 
     zlogger.debug(tree)
 
-    assert tree is not None
+    assert tree.value == ""
+    assert len(tree.children.values()) == 1
 
+    l = tree.children.values()
 
-def test_insert_path_to_tree_node():
-    paths = split_path(Path("tests/cpp"))
-    root_p = paths[0]
-    root_node = TreeNode(root_p, None)
-
-    FileTree.insert_path_to_tree_node(root_node, paths[1:])
+    assert len(l) == 1
