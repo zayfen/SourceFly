@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import os
+import json
 from pathlib import Path
 from typing import List, Optional, TypeVar, Dict
 from sourcefly.common.logger import zlogger
@@ -73,7 +74,7 @@ class TreeNode:
         self,
         value: str,
         parent: Optional[Self] = None,
-        children = {},
+        children={},
     ):
         self.value: str = value
         self.parent = parent
@@ -88,27 +89,34 @@ class TreeNode:
         if node is None:
             return "None"
 
-        # zlogger.debug("__display: " + node.value)
+        return node.tojson()
+        # _children = node.children.values() if node.children is not None else []
+        # return "{head} value: {value}, children: {children} {tail}".format(
+        #     head="{",
+        #     tail="}",
+        #     value=node.value,
+        #     children=str(list(map(lambda c: str(c), _children))),
+        # )
 
-        _children = node.children.values() if node.children is not None else []
-
-        _children = list(filter(lambda c: c != node, _children))
-
-        return "{head} value: {value}, parent: {parent}, children: [{children}] {tail}".format(
-            head="{",
-            tail="}",
-            value=node.value,
-            parent=node.parent,
-            children=str(list(_children)),
+    def todict(self):
+        d = dict()
+        d["value"] = self.value
+        d["children"] = list(
+            map(
+                lambda item: item[1].todict(),
+                self.children.items(),
+            )
         )
+        return d
 
-    # def __str__(self) -> str:
-    #     zlogger.debug(self.value)
-    #     return TreeNode.__display(self)
+    def tojson(self) -> str:
+        return json.dumps(self.todict(), indent=4)
 
-    # def __repr__(self) -> str:
-    #     zlogger.debug(self.value)
-    #     return TreeNode.__display(self)
+    def __str__(self) -> str:
+        return TreeNode.__display(self)
+
+    def __repr__(self) -> str:
+        return TreeNode.__display(self)
 
 
 class FileTree:
@@ -143,7 +151,6 @@ class FileTree:
 
             self.__insert_path_to_tree_node(self.tree_nodes[root_p], paths[1:])
 
-
     def __insert_path_to_tree_node(self, node: TreeNode, children_paths: list[str]):
         zlogger.debug(node.value)
         zlogger.debug(children_paths)
@@ -164,12 +171,11 @@ class FileTree:
                 _parent.children[cp] = new_node
 
             _parent = _parent.children[cp]
-            
+
         zlogger.debug(list(map(lambda c: c.value, node.children.values())))
 
         # now _parent is leaf node (save it)
         self.__save_leaf_node(_parent)
-
 
     def __save_leaf_node(self, node: TreeNode):
         if self.__leaf_nodes.get(node.value) is None:
