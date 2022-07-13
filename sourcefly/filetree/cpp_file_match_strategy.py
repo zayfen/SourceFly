@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 from typing import Optional, Tuple
+
+from sourcefly.common.logger import zlogger
 from sourcefly.filetree.file_match_strategy import FileMatchStrategy
 
 
@@ -13,6 +15,8 @@ class CppFileMatchStrategy(FileMatchStrategy):
         Returns:
         two string items cell
         """
+        zlogger.debug(tailpart)
+
         if tailpart == "":
             return None
 
@@ -23,13 +27,14 @@ class CppFileMatchStrategy(FileMatchStrategy):
 
         extends = tailpart[extend_dot_index + 1 :]
 
+        zlogger.debug(extends)
+
         # maybe standard header, so no .h[pp] extends
-        if extends != "h" or extends != "hpp":
+        if extends != "h" and extends != "hpp":
             return (tailpart,)
 
         noextends = tailpart
         noextends = tailpart[0:extend_dot_index]
 
-        print("extends: ", extends)
-
+        zlogger.info("extends: ", extends)
         return (tailpart, noextends + ".cpp")
