@@ -2,6 +2,7 @@
 
 from pathlib import Path
 from sourcefly.filetree.mod import FileTree, TreeNode, split_path
+from sourcefly.filetree.cpp_file_match_strategy import CppFileMatchStrategy
 from sourcefly.sourcefly_factory.sourcefly_factory import SourceflyFactory
 
 
@@ -21,4 +22,7 @@ if __name__ == '__main__':
     root_p = paths[0]
     root_node = TreeNode(root_p, None)
 
-    FileTree.insert_path_to_tree_node(root_node, paths[1:])
+    tree = FileTree("**/*", CppFileMatchStrategy())
+    tree.build_file_tree(Path("./tests/cpp"))
+    tree.try_find_file(Path("tests/cpp/helper.h"))
+

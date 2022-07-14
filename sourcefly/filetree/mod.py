@@ -66,6 +66,16 @@ def split_path(p: Path) -> list[str]:
     return paths
 
 
+def split_str_path(p: str) -> list[str]:
+    if p is None:
+        return []
+
+    sep = os.path.sep
+    paths = p.split(sep)
+    paths = list(filter(lambda p: p != "", paths))
+    return paths
+
+
 Self = TypeVar("Self", bound="TreeNode")
 
 
@@ -116,8 +126,8 @@ class TreeNode:
     def __str__(self) -> str:
         return TreeNode.__display(self)
 
-    def __repr__(self) -> str:
-        return TreeNode.__display(self)
+    # def __repr__(self) -> str:
+    #     return TreeNode.__display(self)
 
 
 class FileTree:
@@ -192,6 +202,9 @@ class FileTree:
         return self.__root_tree_node()
 
     def leaf_node_to_abs_path(self, node: TreeNode) -> str:
+        if node is None:
+            return ""
+
         paths: list[str] = []
         _node: Optional[TreeNode] = node
 
@@ -201,21 +214,45 @@ class FileTree:
 
         paths.reverse()
 
-        return "/".join(paths)
+        return os.path.sep.join(paths)
 
-    def try_find_file(self, file: Path) -> list[str]:
+    def try_find_file(self, tailpart: str) -> list[str]:
 
-        paths = split_path(file)
+        paths = split_str_path(tailpart)
         paths.reverse()
+
+        zlogger.debug(paths)
 
         if len(paths) <= 0:
             return []
+
+        zlogger.debug(self.__leaf_nodes)
+        zlogger.debug(paths[0])
 
         if self.__leaf_nodes[paths[0]] is None:
             return []
 
         list_tree_nodes = self.__leaf_nodes[paths[0]]
-        for p in paths[1:]:
-            list_tree_nodes = filter(lambda item: item.parent == p, list_tree_nodes)
+        zlogger.debug(list_tree_nodes)
 
-        return list(map(lambda node: self.leaf_node_to_abs_path(node), list_tree_nodes))
+        for p in paths[1:]:
+            zlogger.debug(p)
+
+            list_tree_nodes = list(
+                filter(lambda node: node.parent.value == p, list_tree_nodes)
+            )
+
+            zlogger.debug(list(list_tree_nodes))
+            zlogger.debug(list(list_tree_nodes)[0].parent)
+
+            list_tree_nodes = list(map(lambda node: node.parent, list_tree_nodes))
+            zlogger.debug(list(list_tree_nodes))
+
+        return list(
+            map(
+                lambda node: self.leaf_node_to_abs_path(node.parent)
+                + os.path.sep
+                + tailpart,
+                list_tree_nodes,
+            )
+        )

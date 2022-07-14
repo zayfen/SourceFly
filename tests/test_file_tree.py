@@ -48,7 +48,9 @@ def test_filetree():
 
     assert tree.value == ""
     assert len(tree.children.values()) == 1
-
     l = tree.children.values()
-
     assert len(l) == 1
+
+    files = filetree.try_find_file("tests/cpp/helper.h")
+    zlogger.debug(files)
+    assert len(files) == 1

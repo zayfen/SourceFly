@@ -14,13 +14,3 @@ class App:
         dep_resolver = self.factory.create_dep_resolver()
 
         # FileTree()
-
-
-print("hello")
-if __name__ == "__main__":
-    paths = split_path(Path("../tests/cpp"))
-    root_p = paths[0]
-    root_node = TreeNode(root_p, None)
-    print("hell")
-
-    FileTree.insert_path_to_tree_node(root_node, paths[1:])
