@@ -51,6 +51,6 @@ def test_filetree():
     l = tree.children.values()
     assert len(l) == 1
 
-    files = filetree.try_find_file("tests/cpp/helper.h")
+    files = filetree.try_find_file("helper.h")
     zlogger.debug(files)
     assert len(files) == 1

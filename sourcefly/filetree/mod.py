@@ -191,7 +191,7 @@ class FileTree:
     def __save_leaf_node(self, node: TreeNode):
         if self.__leaf_nodes.get(node.value) is None:
             self.__leaf_nodes[node.value] = []
-            self.__leaf_nodes[node.value].append(node)
+        self.__leaf_nodes[node.value].append(node)
 
     def build_file_tree(self, dir: Path) -> Optional[TreeNode]:
         files = list_files(dir)
