@@ -53,4 +53,4 @@ def test_filetree():
 
     files = filetree.try_find_file("helper.h")
     zlogger.debug(files)
-    assert len(files) == 1
+    assert len(files) == 2

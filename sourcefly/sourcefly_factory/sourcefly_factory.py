@@ -11,3 +11,7 @@ class SourceflyFactory(ABC):
     @abstractmethod
     def create_dep_resolver(self) -> DepResolver:
         pass
+
+    @abstractmethod
+    def create_glob_pattern(self) -> str:
+        pass

@@ -1,8 +1,12 @@
+import json
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Optional, Dict, List, Any, TypeVar
 
 from sourcefly.filetree.file_match_strategy import FileMatchStrategy
+
+
+Self = TypeVar("Self", bound="FileDeps")
 
 
 class FileDeps(object):
@@ -10,15 +14,24 @@ class FileDeps(object):
         self.file = file
         self.deps: list[FileDeps] = list()
 
+    def todict(self) -> Dict[str, Any]:
+        d = dict()
+        d["file"] = str(self.file)
+        d["deps"] = list(map(lambda dep: dep.todict(), self.deps))
+        return d
+
+    def tojson(self) -> str:
+        return json.dumps(self.todict(), indent=2)
+
+    @staticmethod
+    def __display(node: Self) -> str:
+        if node is None:
+            return "None"
+
+        return node.tojson()
+
     def __str__(self):
-        return (
-            "{ file: "
-            + str(self.file)
-            + ", "
-            + "deps: [ "
-            + "\n".join(map(lambda fd: str(fd), self.deps))
-            + " ] }"
-        )
+        return FileDeps.__display(self)
 
 
 class DepResolver(ABC):
@@ -26,7 +39,7 @@ class DepResolver(ABC):
         self.entry = None
 
         self._resolved: Dict[
-            Path, bool
+            Path, FileDeps
         ] = dict()  # cache resolved file, prevent file from parsing again
         self._root: Optional[FileDeps] = None
 
@@ -38,11 +51,14 @@ class DepResolver(ABC):
         """
         pass
 
-    def __cache_file(self, file: Path):
+    def __cache_file(self, file: Path, fd: FileDeps):
         """
         Cache already parsed file
         """
-        self._resolved[file] = True
+        self._resolved[file] = fd
+
+    def __retrive_cache_file(self, file: Path) -> FileDeps:
+        return self._resolved[file]
 
     def set_entry(self, entry: Path):
         self.entry = entry
@@ -52,20 +68,20 @@ class DepResolver(ABC):
             raise ValueError("self.entry is None, please set entry first")
 
     def path_cached(self, file: Path) -> bool:
-        return self._resolved.get(file, False)
+        return self._resolved.get(file) != None
 
-    def find_file_deps(self, file: Path) -> Optional[FileDeps]:
-        return None
+    def gen_file_deps(self, file: Path) -> Optional[FileDeps]:
 
-    def gen_file_deps(self, file: Optional[Path]) -> Optional[FileDeps]:
+        if file is None:
+            raise ValueError("file can't be None!")
 
-        if file is None or self.path_cached(file):
-            return None
+        if self.path_cached(file):
+            return self.__retrive_cache_file(file)
 
         fd = FileDeps(file)
 
         # cache file first
-        self.__cache_file(file)
+        self.__cache_file(file, fd)
 
         deps_paths: list[Path] = self.parse_deps(fd.file)
 
@@ -87,3 +103,27 @@ class DepResolver(ABC):
             self._root = file_deps
 
         return self._root
+
+
+def filedeps_walker(filedeps: FileDeps):
+    if filedeps is None:
+        raise ValueError("filedeps can't be None")
+    stack: List[FileDeps] = []
+    stack.append(filedeps)
+
+    def walk() -> Optional[FileDeps]:
+        nonlocal stack
+        if len(stack) <= 0:
+            stack = None  # mark stack be None, when len(stack) calling, will raise exception
+            return None
+
+        current = stack.pop(0)
+
+        if current is not None:
+            for dep in current.deps:
+                if dep is not None:
+                    stack.append(dep)
+
+        return current
+
+    return walk

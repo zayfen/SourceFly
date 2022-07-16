@@ -229,7 +229,7 @@ class FileTree:
         zlogger.debug(self.__leaf_nodes)
         zlogger.debug(paths[0])
 
-        if self.__leaf_nodes[paths[0]] is None:
+        if self.__leaf_nodes.get(paths[0]) is None:
             return []
 
         list_tree_nodes = self.__leaf_nodes[paths[0]]

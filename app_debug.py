@@ -17,7 +17,7 @@ class App:
         # FileTree()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     paths = split_path(Path("./tests/cpp"))
     root_p = paths[0]
     root_node = TreeNode(root_p, None)
@@ -25,4 +25,3 @@ if __name__ == '__main__':
     tree = FileTree("**/*", CppFileMatchStrategy())
     tree.build_file_tree(Path("./tests/cpp"))
     tree.try_find_file(Path("tests/cpp/helper.h"))
-

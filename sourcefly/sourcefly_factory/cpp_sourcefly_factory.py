@@ -11,3 +11,6 @@ class CppSourceFactory(SourceflyFactory):
 
     def create_match_strategy(self) -> FileMatchStrategy:
         return CppFileMatchStrategy()
+
+    def create_glob_pattern(self) -> str:
+        return "**/*"
