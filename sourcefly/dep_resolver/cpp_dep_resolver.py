@@ -3,11 +3,14 @@
 from pathlib import Path
 import re
 from sourcefly.dep_resolver.dep_resolver import DepResolver
+from sourcefly.filetree.file_match_strategy import FileMatchStrategy
+from sourcefly.filetree.cpp_file_match_strategy import CppFileMatchStrategy
+from sourcefly.filetree.mod import FileTree
 
 
 class CppDepResolver(DepResolver):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, filetree: FileTree):
+        super().__init__(filetree)
 
     def parse_deps(self, file: Path) -> list[Path]:
         cpp_include_pattern = re.compile(
@@ -24,5 +27,18 @@ class CppDepResolver(DepResolver):
         matched_list: list[str] = cpp_include_pattern.findall(file_content)
 
         print("cpp_dep_resolver.py: matched_list: ", matched_list)
-        # to get all include files(tailpart)
-        return list(map(lambda f: Path(f), matched_list))
+        # use match strategy to match more related files
+
+        return [
+            Path(p)
+            for sublist in list(
+                map(
+                    lambda f: self.dep_file_match_strategy().possible_matches(f),
+                    matched_list,
+                )
+            )
+            for p in sublist
+        ]
+
+    def dep_file_match_strategy(self) -> FileMatchStrategy:
+        return CppFileMatchStrategy()

@@ -2,8 +2,9 @@ import json
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional, Dict, List, Any, TypeVar
-
+from sourcefly.filetree.mod import FileTree
 from sourcefly.filetree.file_match_strategy import FileMatchStrategy
+from sourcefly.common.logger import zlogger
 
 
 Self = TypeVar("Self", bound="FileDeps")
@@ -35,13 +36,15 @@ class FileDeps(object):
 
 
 class DepResolver(ABC):
-    def __init__(self):
+    def __init__(self, filetree: FileTree):
         self.entry = None
 
         self._resolved: Dict[
             Path, FileDeps
         ] = dict()  # cache resolved file, prevent file from parsing again
         self._root: Optional[FileDeps] = None
+
+        self._filetree = filetree
 
     @abstractmethod
     def parse_deps(self, file: Path) -> list[Path]:
@@ -51,14 +54,18 @@ class DepResolver(ABC):
         """
         pass
 
+    @abstractmethod
+    def dep_file_match_strategy(self) -> FileMatchStrategy:
+        pass
+
     def __cache_file(self, file: Path, fd: FileDeps):
         """
         Cache already parsed file
         """
-        self._resolved[file] = fd
+        self._resolved[file.absolute()] = fd
 
     def __retrive_cache_file(self, file: Path) -> FileDeps:
-        return self._resolved[file]
+        return self._resolved[file.absolute()]
 
     def set_entry(self, entry: Path):
         self.entry = entry
@@ -84,6 +91,19 @@ class DepResolver(ABC):
         self.__cache_file(file, fd)
 
         deps_paths: list[Path] = self.parse_deps(fd.file)
+
+        abs_dep_paths = [
+            Path(p)
+            for sublist in list(
+                map(
+                    lambda dep_path: self._filetree.try_find_file(str(dep_path)),
+                    deps_paths,
+                )
+            )
+            for p in sublist
+        ]
+
+        zlogger.debug(abs_dep_paths)
 
         optional_deps_iter = map(
             lambda dep_path: self.gen_file_deps(dep_path), deps_paths

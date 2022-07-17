@@ -131,9 +131,8 @@ class TreeNode:
 
 
 class FileTree:
-    def __init__(self, glob_pattern: str, match_strategy: FileMatchStrategy):
+    def __init__(self, glob_pattern: str):
         self.glob_pattern = glob_pattern
-        self.match_strategy = match_strategy
         self.tree_nodes = {}  # dict[str, TreeNode]
         self.__root = None
 
