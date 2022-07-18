@@ -174,7 +174,6 @@ class FileTree:
             return
 
         for cp in children_paths:
-            zlogger.info(cp)
             if _parent.children.get(cp) is None:
                 zlogger.info(" is None")
                 new_node = TreeNode(cp, _parent, dict())

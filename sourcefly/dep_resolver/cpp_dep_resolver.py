@@ -2,10 +2,12 @@
 
 from pathlib import Path
 import re
+from typing import Optional, Tuple
 from sourcefly.dep_resolver.dep_resolver import DepResolver
 from sourcefly.filetree.file_match_strategy import FileMatchStrategy
 from sourcefly.filetree.cpp_file_match_strategy import CppFileMatchStrategy
 from sourcefly.filetree.mod import FileTree
+from sourcefly.common.logger import zlogger
 
 
 class CppDepResolver(DepResolver):
@@ -19,6 +21,7 @@ class CppDepResolver(DepResolver):
 
         file_content = ""
         if not file.exists():
+            zlogger.debug("{file} is not existed!".format(file=file))
             return []
 
         with open(file.absolute(), "r") as f:
@@ -29,16 +32,18 @@ class CppDepResolver(DepResolver):
         print("cpp_dep_resolver.py: matched_list: ", matched_list)
         # use match strategy to match more related files
 
-        return [
-            Path(p)
-            for sublist in list(
-                map(
-                    lambda f: self.dep_file_match_strategy().possible_matches(f),
-                    matched_list,
-                )
+        list_of_opt_tuple: list[Optional[Tuple]] = list(
+            map(
+                lambda f: self.dep_file_match_strategy().possible_matches(f),
+                matched_list,
             )
-            for p in sublist
-        ]
+        )
+
+        list_of_tuple: list[Tuple] = list(
+            filter(lambda opt_tuple: opt_tuple is not None, list_of_opt_tuple)
+        )
+
+        return [Path(p) for sublist in list_of_tuple for p in sublist]
 
     def dep_file_match_strategy(self) -> FileMatchStrategy:
         return CppFileMatchStrategy()

@@ -2,23 +2,26 @@
 
 from pathlib import Path
 from sourcefly.dep_resolver.cpp_dep_resolver import CppDepResolver
+from sourcefly.filetree.mod import FileTree
+from sourcefly.common.logger import zlogger
 
 
 def test_dep_resolver():
-    cpp_entry = "/home/zhangyunfeng@pudu.com/github.com/SourceFly/tests/main.cpp"
+    cpp_entry = "/home/zayfen/github.com/SourceFly/tests/cpp/main.cpp"
     cpp_entry_file = Path(
         cpp_entry
         # "/home/zayfen/github.com/SourceFly/tests/main.cpp"
     )
-    cdr = CppDepResolver(cpp_entry_file)
+
+    filetree = FileTree("**/*")
+    filetree.build_file_tree(Path("tests/cpp"))
+
+    cdr = CppDepResolver(filetree)
+    cdr.set_entry(cpp_entry_file)
     file_deps = cdr.deps_tree()
 
-    print("file_deps.file: ", file_deps.file if file_deps is not None else "None")
-    print(
-        "file-deps.depends: ",
-        len(file_deps.deps if file_deps is not None else []),
-        file_deps.deps if file_deps is not None else "None",
-    )
+    zlogger.debug(file_deps)
+
     if file_deps is not None:
         assert file_deps.file == Path(cpp_entry)
         assert len(file_deps.deps) == 3

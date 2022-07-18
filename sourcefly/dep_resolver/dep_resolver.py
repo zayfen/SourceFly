@@ -92,6 +92,8 @@ class DepResolver(ABC):
 
         deps_paths: list[Path] = self.parse_deps(fd.file)
 
+        zlogger.debug(deps_paths)
+
         abs_dep_paths = [
             Path(p)
             for sublist in list(
@@ -106,7 +108,7 @@ class DepResolver(ABC):
         zlogger.debug(abs_dep_paths)
 
         optional_deps_iter = map(
-            lambda dep_path: self.gen_file_deps(dep_path), deps_paths
+            lambda dep_path: self.gen_file_deps(dep_path), abs_dep_paths
         )
 
         # remove None deps
@@ -116,6 +118,9 @@ class DepResolver(ABC):
 
     def deps_tree(self) -> Optional[FileDeps]:
         self.__check_entry()
+        if self.entry is None:
+            return None
+
         file_deps = self.gen_file_deps(self.entry)
 
         # if resovled already, file_deps will be None
