@@ -1,5 +1,4 @@
 from pathlib import Path
-from sourcefly.filetree.mod import FileTree, TreeNode, split_path
 from sourcefly.sourcefly_factory.sourcefly_factory import SourceflyFactory
 from sourcefly.dep_resolver.dep_resolver import filedeps_walker
 from sourcefly.common.logger import zlogger
@@ -15,6 +14,9 @@ class App:
         # resolve project entry file, to get all project files
         opt_file_deps = dep_resolver.gen_file_deps(entry)
         zlogger.debug(opt_file_deps)
+
+        if opt_file_deps is None:
+            return []
 
         walk = filedeps_walker(opt_file_deps)
 

@@ -219,15 +219,14 @@ class FileTree:
         paths = split_str_path(tailpart)
         paths.reverse()
 
-        zlogger.debug(paths)
-
         if len(paths) <= 0:
+            zlogger.debug(
+                "find {paths} results {results}".format(paths=paths, results=[])
+            )
             return []
 
-        zlogger.debug(self.__leaf_nodes)
-        zlogger.debug(paths[0])
-
         if self.__leaf_nodes.get(paths[0]) is None:
+            zlogger.debug("{path} didn't in filtree".format(path=tailpart))
             return []
 
         list_tree_nodes = self.__leaf_nodes[paths[0]]

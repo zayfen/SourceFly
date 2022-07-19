@@ -7,10 +7,9 @@ from sourcefly.common.logger import zlogger
 
 
 def test_dep_resolver():
-    cpp_entry = "/home/zayfen/github.com/SourceFly/tests/cpp/main.cpp"
-    cpp_entry_file = Path(
-        cpp_entry
-        # "/home/zayfen/github.com/SourceFly/tests/main.cpp"
+    home = Path.home()
+    cpp_entry_file = Path.joinpath(
+        home, Path("github.com/SourceFly/tests/cpp/main.cpp")
     )
 
     filetree = FileTree("**/*")
@@ -23,7 +22,7 @@ def test_dep_resolver():
     zlogger.debug(file_deps)
 
     if file_deps is not None:
-        assert file_deps.file == Path(cpp_entry)
+        assert file_deps.file == cpp_entry_file
         assert len(file_deps.deps) == 3
     else:
         assert False, "file_deps shouldn't be None"
