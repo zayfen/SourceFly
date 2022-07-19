@@ -233,19 +233,16 @@ class FileTree:
         zlogger.debug(list_tree_nodes)
 
         for p in paths[1:]:
-            zlogger.debug(p)
 
             list_tree_nodes = list(
                 filter(lambda node: node.parent.value == p, list_tree_nodes)
             )
 
-            zlogger.debug(list(list_tree_nodes))
-            zlogger.debug(list(list_tree_nodes)[0].parent)
-
             list_tree_nodes = list(map(lambda node: node.parent, list_tree_nodes))
-            zlogger.debug(list(list_tree_nodes))
 
-        return list(
+        zlogger.debug(list_tree_nodes)
+
+        abs_paths = list(
             map(
                 lambda node: self.leaf_node_to_abs_path(node.parent)
                 + os.path.sep
@@ -253,3 +250,7 @@ class FileTree:
                 list_tree_nodes,
             )
         )
+
+        zlogger.debug(abs_paths)
+
+        return abs_paths
