@@ -6,13 +6,16 @@ from sourcefly.filetree.mod import FileTree
 
 
 class SourceflyFactory(ABC):
+    def __init__(self, project_root_dir: Path):
+        self.project_root_dir = project_root_dir
+
     @abstractmethod
-    def build_dep_resolver(self, project_root_dir: Path) -> DepResolver:
+    def build_dep_resolver(self) -> DepResolver:
         pass
 
-    def _build_file_tree(self, project_root_dir: Path) -> FileTree:
+    def _build_file_tree(self) -> FileTree:
         filetree = FileTree(self.provide_glob_pattern())
-        filetree.build_file_tree(project_root_dir)
+        filetree.build_file_tree(self.project_root_dir)
         return filetree
 
     @abstractmethod

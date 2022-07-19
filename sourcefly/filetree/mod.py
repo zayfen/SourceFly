@@ -140,6 +140,11 @@ class FileTree:
         # __leaf_nodes type: Dict[str, list[TreeNode]]
         self.__leaf_nodes: Dict[str, list[TreeNode]] = dict()
 
+    def __reset_context(self):
+        self.tree_nodes = dict()
+        self.__root = None
+        self.__leaf_nodes = dict()
+
     def __root_tree_node(self) -> Optional[TreeNode]:
         if self.__root is None:
             self.__root = TreeNode("", parent=None, children=self.tree_nodes)
@@ -199,6 +204,10 @@ class FileTree:
 
         return self.__root_tree_node()
 
+    def rebuild_file_tree(self, dir: Path) -> Optional[TreeNode]:
+        self.__reset_context()
+        return self.build_file_tree(dir)
+
     def leaf_node_to_abs_path(self, node: TreeNode) -> str:
         if node is None:
             return ""
@@ -210,6 +219,7 @@ class FileTree:
             paths.append(_node.value)
             _node = _node.parent
 
+        paths.append("")  ## make path leading with /
         paths.reverse()
 
         return os.path.sep.join(paths)

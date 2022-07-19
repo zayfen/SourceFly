@@ -4,7 +4,6 @@ from pathlib import Path
 from sourcefly.filetree.cpp_file_match_strategy import CppFileMatchStrategy
 from sourcefly.filetree.mod import (
     FileTree,
-    TreeNode,
     find_files_by_tailpart,
     list_files,
     split_path,
@@ -14,8 +13,7 @@ from sourcefly.common.logger import zlogger
 
 def test_list_files():
     path_list = list_files(Path("./tests/cpp/"))
-    print(path_list)
-    assert len(path_list) == 6
+    assert len(path_list) == 7
 
 
 def test_find_files_by_tailpart():
@@ -40,15 +38,20 @@ def test_split_path():
 
 
 def test_filetree():
-    filetree = FileTree("**/*", CppFileMatchStrategy())
+    filetree = FileTree("**/*")
 
     tree = filetree.build_file_tree(Path("tests/cpp/"))
 
     zlogger.debug(tree)
 
+    assert tree is not None
+
     assert tree.value == ""
+
     assert len(tree.children.values()) == 1
+
     l = tree.children.values()
+
     assert len(l) == 1
 
     files = filetree.try_find_file("helper.h")

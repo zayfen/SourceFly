@@ -1,7 +1,7 @@
 from sourcefly.filetree.cpp_file_match_strategy import CppFileMatchStrategy
 
 
-def test_cpp():
+def test_cpp_file_match_strategy():
     cfms = CppFileMatchStrategy()
     matches = cfms.possible_matches("header.abc.h")
     assert matches != None and matches[0] == "header.abc.h"

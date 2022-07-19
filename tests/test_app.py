@@ -5,10 +5,10 @@ from sourcefly.common.logger import zlogger
 
 
 def test_app():
-    factory = CppSourceFactory()
+    factory = CppSourceFactory(Path("tests"))
     app = App(factory)
 
-    list = app.fly(Path("tests"), Path("tests/cpp/main.cpp"))
+    list = app.fly(Path("tests/cpp/main.cpp"))
 
     zlogger.debug(list)
     assert len(list) > 0

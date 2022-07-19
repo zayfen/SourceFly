@@ -36,8 +36,8 @@ class FileDeps(object):
 
 
 class DepResolver(ABC):
-    def __init__(self, filetree: FileTree):
-        self.entry = None
+    def __init__(self, filetree: FileTree, entry=None):
+        self.entry = entry
 
         self._resolved: Dict[
             Path, FileDeps

@@ -11,8 +11,8 @@ from sourcefly.common.logger import zlogger
 
 
 class CppDepResolver(DepResolver):
-    def __init__(self, filetree: FileTree):
-        super().__init__(filetree)
+    def __init__(self, filetree: FileTree, entry=None):
+        super().__init__(filetree, entry)
 
     def parse_deps(self, file: Path) -> list[Path]:
         cpp_include_pattern = re.compile(

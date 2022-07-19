@@ -8,8 +8,11 @@ from sourcefly.filetree.mod import FileTree
 
 
 class CppSourceFactory(SourceflyFactory):
-    def build_dep_resolver(self, project_root_dir: Path) -> DepResolver:
-        return CppDepResolver(self._build_file_tree(project_root_dir))
+    def __init__(self, project_root_dir: Path):
+        super().__init__(project_root_dir)
+
+    def build_dep_resolver(self) -> DepResolver:
+        return CppDepResolver(self._build_file_tree())
 
     def provide_glob_pattern(self) -> str:
         return "**/*"

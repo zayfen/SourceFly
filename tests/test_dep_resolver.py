@@ -15,8 +15,7 @@ def test_dep_resolver():
     filetree = FileTree("**/*")
     filetree.build_file_tree(Path("tests/cpp"))
 
-    cdr = CppDepResolver(filetree)
-    cdr.set_entry(cpp_entry_file)
+    cdr = CppDepResolver(filetree, cpp_entry_file)
     file_deps = cdr.deps_tree()
 
     zlogger.debug(file_deps)
