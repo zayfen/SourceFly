@@ -4,7 +4,10 @@ from pathlib import Path
 from sourcefly.file_migrations.file_migrations import (
     public_path_of_files,
     same_path_root,
+    target_path_of_files,
 )
+from sourcefly.filetree.mod import list_files
+from sourcefly.common.logger import zlogger
 
 
 def test_same_path_root():
@@ -41,3 +44,10 @@ def test_public_path_of_files():
     pp = public_path_of_files(llp)
 
     assert pp == str(Path.joinpath(Path.home(), "github.com"))
+
+
+def test_target_path_of_files():
+    files = list_files(Path("tests/cpp"))
+    target_files = target_path_of_files(files, Path("src/"))
+
+    assert target_files is not None

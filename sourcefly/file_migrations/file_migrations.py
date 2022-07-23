@@ -50,6 +50,40 @@ def public_path_of_files(files: List[Path]) -> str:
     return "/" + os.path.sep.join(l)
 
 
+def target_path_of_files(files: List[Path], target_dir: Path) -> List[Path]:
+    """
+    Assume target_dir is existed directory
+    Assume PUBLIC_PATH is public_path_of_files(files),
+    target file is target_dir join {PUBLIC_PATH}
+    """
+    public_path = public_path_of_files(files)
+
+    target_abs_dir = target_dir.absolute()
+
+    zlogger.debug(target_abs_dir)
+
+    len_public_path = len(public_path)
+
+    files_prune_public_path = list(
+        map(lambda f: str(f.absolute())[len_public_path:], files)
+    )
+
+    zlogger.debug(files_prune_public_path)
+
+    target_file_paths = []
+    zlogger.debug("skdfk")
+    zlogger.debug(len(files_prune_public_path))
+
+    zlogger.debug(target_dir)
+
+    for p in files_prune_public_path:
+        target_file_paths.append(Path(str(target_dir) + p).absolute())
+
+    zlogger.debug(target_file_paths)
+
+    return target_file_paths
+
+
 def migrate(files: List[Path], target_dir: Path):
     """to migrate files to target directory
     we will remove public prefix of files.
