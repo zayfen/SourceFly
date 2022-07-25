@@ -1,7 +1,10 @@
 from pathlib import Path
+from sourcefly.file_migrations.file_migrations import migrate
 from sourcefly.sourcefly_factory.sourcefly_factory import SourceflyFactory
 from sourcefly.dep_resolver.dep_resolver import filedeps_walker
 from sourcefly.common.logger import zlogger
+
+from typing import List
 
 
 class App:
@@ -9,6 +12,7 @@ class App:
         self.factory = factory
 
     def fly(self, entry: Path) -> list[str]:
+        entry = entry.resolve()
         dep_resolver = self.factory.build_dep_resolver()
 
         # resolve project entry file, to get all project files
@@ -34,3 +38,6 @@ class App:
         zlogger.debug(final_paths)
 
         return final_paths
+
+    def migrage_to(self, files: List[Path], dst: Path):
+        migrate(files, dst)

@@ -3,6 +3,8 @@ from typing import List
 from pathlib import Path
 from sourcefly.filetree.mod import split_path
 from sourcefly.common.logger import zlogger
+from shutil import copyfile
+from sourcefly.common.fs_ops import create_file
 
 
 def same_path_root(splited_files: List[List[str]]) -> bool:
@@ -33,6 +35,9 @@ def same_path_root(splited_files: List[List[str]]) -> bool:
 def public_path_of_files(files: List[Path]) -> str:
     if not files:
         return ""
+
+    if len(files) == 1:
+        return str(files[0].parent.resolve())
 
     splited_files = list(map(lambda file: split_path(file), files))
     zlogger.debug(splited_files)
@@ -95,6 +100,20 @@ def migrate(files: List[Path], target_dir: Path):
         None
 
     Example:
-
     """
-    pass
+    public_path = public_path_of_files(files)
+    len_of_public_path = len(public_path)
+
+    for p in files:
+        # +1 ignore /
+        tail_path = str(p.resolve())[(len_of_public_path + 1) :]
+
+        zlogger.debug("target_dir is {}".format(target_dir.resolve()))
+        zlogger.debug("tail_path is {}".format(tail_path))
+
+        dst_path = target_dir.resolve().joinpath(tail_path)
+
+        zlogger.debug("from {p} to {new_path}".format(p=p, new_path=dst_path))
+
+        create_file(dst_path)
+        copyfile(p, dst_path)
